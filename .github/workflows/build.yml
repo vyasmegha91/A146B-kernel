@@ -29,9 +29,10 @@ jobs:
 
     - name: Download Kernel Source
       run: |
-        git clone --depth=1 \
-          https://github.com/samsung-sm8450/android_kernel_samsung_sm8450 \
-          kernel-source || true
+        curl -L -o kernel.tar.gz \
+          https://github.com/vyasmegha91/A146B-kernel/releases/download/v1.0/Kernel.tar.gz
+        mkdir kernel-source
+        tar -xzf kernel.tar.gz -C kernel-source --strip-components=1
 
     - name: Build Kernel
       run: |
@@ -41,13 +42,8 @@ jobs:
         make ARCH=arm64 exynos1330-a14xmxx_defconfig
         make ARCH=arm64 -j$(nproc)
 
-    - name: Package Kernel
-      run: |
-        echo "Build complete!"
-
     - name: Upload Result
       uses: actions/upload-artifact@v4
       with:
         name: kernel
         path: kernel-source/arch/arm64/boot/Image
-        
