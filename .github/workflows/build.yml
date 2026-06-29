@@ -40,6 +40,7 @@ jobs:
         echo "CONFIG_SCSI_UFS_EXYNOS=n" >> arch/arm64/configs/s5e8535-a14xxx_defconfig
         echo "CONFIG_SCSI_UFS_EXYNOS_BLOCK=n" >> arch/arm64/configs/s5e8535-a14xxx_defconfig
         echo "CONFIG_SCSI_SRPMB=n" >> arch/arm64/configs/s5e8535-a14xxx_defconfig
+        echo "CONFIG_NANOHUB=n" >> arch/arm64/configs/s5e8535-a14xxx_defconfig
         chmod +w drivers/scsi/scsi_srpmb.c
         chmod +w drivers/scsi/ufs/ufs-exynos-srpmb.c
         chmod +w drivers/scsi/ufs/ufs-exynos-fmp.c
