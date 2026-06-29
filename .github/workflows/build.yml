@@ -27,7 +27,7 @@ jobs:
         run: |
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
-          make exynos1330-a14xmxx_defconfig
+          make s5e8535-a14xxx_defconfig
           make -j$(nproc)
 
       - name: Package Kernel
