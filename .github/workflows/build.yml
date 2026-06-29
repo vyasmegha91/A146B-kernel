@@ -1,0 +1,46 @@
+name: Build A146B Kernel
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git gcc g++ make bc \
+            libssl-dev libelf-dev \
+            aarch64-linux-gnu-gcc \
+            binutils-aarch64-linux-gnu \
+            python3 zip unzip
+
+      - name: Upload Kernel Source
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel-source
+          path: .
+
+      - name: Build Kernel
+        run: |
+          export ARCH=arm64
+          export CROSS_COMPILE=aarch64-linux-gnu-
+          make exynos1330-a14xmxx_defconfig
+          make -j$(nproc)
+
+      - name: Package Kernel
+        run: |
+          zip -r kernel-A146B.zip arch/arm64/boot/
+
+      - name: Upload Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel-A146B
+          path: kernel-A146B.zip
