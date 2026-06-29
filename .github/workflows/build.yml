@@ -1,41 +1,53 @@
 name: Build A146B Kernel
 
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      - name: Download Kernel Source
-        run: |
-          wget https://github.com/vyasmegha91/A146B-kernel/releases/download/v1.0/Kernel.tar.gz
-          tar -xzf Kernel.tar.gz
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          bc bison flex libssl-dev \
+          make gcc git curl zip \
+          libelf-dev python3
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git gcc g++ make bc \
-            libssl-dev libelf-dev \
-            gcc-aarch64-linux-gnu \
-            binutils-aarch64-linux-gnu python3
+    - name: Download Toolchain
+      run: |
+        git clone --depth=1 \
+          https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 \
+          toolchain
 
-      - name: Build Kernel
-        run: |
-          export ARCH=arm64
-          export CROSS_COMPILE=aarch64-linux-gnu-
-          make s5e8535-a14xxx_defconfig
-          make -j$(nproc)
+    - name: Download Kernel Source
+      run: |
+        git clone --depth=1 \
+          https://github.com/samsung-sm8450/android_kernel_samsung_sm8450 \
+          kernel-source || true
 
-      - name: Package Kernel
-        run: |
-          zip -r kernel-A146B.zip arch/arm64/boot/
+    - name: Build Kernel
+      run: |
+        export ARCH=arm64
+        export CROSS_COMPILE=$(pwd)/toolchain/bin/aarch64-linux-android-
+        cd kernel-source
+        make ARCH=arm64 exynos1330-a14xmxx_defconfig
+        make ARCH=arm64 -j$(nproc)
 
-      - name: Upload Result
-        uses: actions/upload-artifact@v4
-        with:
-          name: kernel-A146B
-          path: kernel-A146B.zip
+    - name: Package Kernel
+      run: |
+        echo "Build complete!"
+
+    - name: Upload Result
+      uses: actions/upload-artifact@v3
+      with:
+        name: kernel
+        path: kernel-source/arch/arm64/boot/Image
+        
