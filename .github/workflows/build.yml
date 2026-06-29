@@ -1,61 +1,9 @@
-name: Build A146B Kernel
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-22.04
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          bc bison flex libssl-dev \
-          make git curl zip \
-          libelf-dev python3 \
-          clang lld llvm \
-          binutils-aarch64-linux-gnu \
-          gcc-aarch64-linux-gnu
-
-    - name: Download Kernel Source
-      run: |
-        curl -L -o kernel.tar.gz \
-          https://github.com/vyasmegha91/A146B-kernel/releases/download/v1.0/Kernel.tar.gz
-        mkdir kernel-source
-        tar -xzf kernel.tar.gz -C kernel-source --strip-components=1
-
-    - name: Build Kernel
+- name: Build Kernel
       run: |
         export ARCH=arm64
-        export CROSS_COMPILE=aarch64-linux-gnu-
-        export CLANG_TRIPLE=aarch64-linux-gnu-
         cd kernel-source
-        make ARCH=arm64 \
-          CC=clang \
-          LD=ld.lld \
-          AR=llvm-ar \
-          NM=llvm-nm \
-          OBJCOPY=llvm-objcopy \
-          CROSS_COMPILE=aarch64-linux-gnu- \
-          exynos1330-a14xmxx_defconfig
-        make ARCH=arm64 \
-          CC=clang \
-          LD=ld.lld \
-          AR=llvm-ar \
-          NM=llvm-nm \
-          OBJCOPY=llvm-objcopy \
-          CROSS_COMPILE=aarch64-linux-gnu- \
-          -j$(nproc)
-
-    - name: Upload Result
-      uses: actions/upload-artifact@v4
-      with:
-        name: kernel
-        path: kernel-source/arch/arm64/boot/Image
+        echo "=== Defconfig files ==="
+        find . -name "*defconfig*" | head -30
+        echo "=== arch/arm64/configs ==="
+        ls arch/arm64/configs/ | head -30
+        
