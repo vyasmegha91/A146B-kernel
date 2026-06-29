@@ -40,9 +40,9 @@ jobs:
         echo "CONFIG_SCSI_UFS_EXYNOS=n" >> arch/arm64/configs/s5e8535-a14xxx_defconfig
         echo "CONFIG_SCSI_UFS_EXYNOS_BLOCK=n" >> arch/arm64/configs/s5e8535-a14xxx_defconfig
         echo "CONFIG_SCSI_SRPMB=n" >> arch/arm64/configs/s5e8535-a14xxx_defconfig
-        find . -name "*.c" -exec grep -l "ufs-cal-if\|ufs-vs-mmio\|ufs-cal-virt\|ufs-vs-regs\|ufs-vs-log" {} \; | while read f; do
-          echo "" > "$f"
-        done
+        echo "" > drivers/scsi/scsi_srpmb.c
+        echo "" > drivers/scsi/ufs/ufs-exynos-srpmb.c
+        echo "" > drivers/scsi/ufs/ufs-exynos-fmp.c
         make ARCH=arm64 \
           CC=clang \
           CLANG_TRIPLE=aarch64-linux-gnu- \
