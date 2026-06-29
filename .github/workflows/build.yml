@@ -31,14 +31,30 @@ jobs:
         mkdir kernel-source
         tar -xzf kernel.tar.gz -C kernel-source --strip-components=1
 
-    - name: Check Defconfig
+    - name: Build Kernel
       run: |
+        export ARCH=arm64
+        export CROSS_COMPILE=aarch64-linux-gnu-
         cd kernel-source
-        echo "=== Available defconfigs ==="
-        ls arch/arm64/configs/ | grep -i "a14\|exynos\|s5e"
+        make ARCH=arm64 \
+          CC=clang \
+          LD=ld.lld \
+          AR=llvm-ar \
+          NM=llvm-nm \
+          OBJCOPY=llvm-objcopy \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          s5e8535-a14xxx_defconfig
+        make ARCH=arm64 \
+          CC=clang \
+          LD=ld.lld \
+          AR=llvm-ar \
+          NM=llvm-nm \
+          OBJCOPY=llvm-objcopy \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          -j$(nproc)
 
     - name: Upload Result
       uses: actions/upload-artifact@v4
       with:
-        name: defconfig-list
-        path: kernel-source/arch/arm64/configs/
+        name: kernel-image
+        path: kernel-source/arch/arm64/boot/Image
