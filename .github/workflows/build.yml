@@ -20,7 +20,9 @@ jobs:
           bc bison flex libssl-dev \
           make git curl zip \
           libelf-dev python3 \
-          clang lld llvm
+          clang lld llvm \
+          binutils-aarch64-linux-gnu \
+          gcc-aarch64-linux-gnu
 
     - name: Download Kernel Source
       run: |
@@ -32,17 +34,23 @@ jobs:
     - name: Build Kernel
       run: |
         export ARCH=arm64
-        export CLANG_TRIPLE=aarch64-linux-gnu-
         export CROSS_COMPILE=aarch64-linux-gnu-
+        export CLANG_TRIPLE=aarch64-linux-gnu-
         cd kernel-source
         make ARCH=arm64 \
           CC=clang \
-          CLANG_TRIPLE=aarch64-linux-gnu- \
+          LD=ld.lld \
+          AR=llvm-ar \
+          NM=llvm-nm \
+          OBJCOPY=llvm-objcopy \
           CROSS_COMPILE=aarch64-linux-gnu- \
           exynos1330-a14xmxx_defconfig
         make ARCH=arm64 \
           CC=clang \
-          CLANG_TRIPLE=aarch64-linux-gnu- \
+          LD=ld.lld \
+          AR=llvm-ar \
+          NM=llvm-nm \
+          OBJCOPY=llvm-objcopy \
           CROSS_COMPILE=aarch64-linux-gnu- \
           -j$(nproc)
 
@@ -51,4 +59,3 @@ jobs:
       with:
         name: kernel
         path: kernel-source/arch/arm64/boot/Image
-        
