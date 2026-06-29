@@ -35,6 +35,7 @@ jobs:
       run: |
         export ARCH=arm64
         cd kernel-source
+        echo "CONFIG_SCSI_UFS_EXYNOS_SRPMB=n" >> arch/arm64/configs/s5e8535-a14xxx_defconfig
         make ARCH=arm64 \
           CC=clang \
           CLANG_TRIPLE=aarch64-linux-gnu- \
