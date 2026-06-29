@@ -18,14 +18,9 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y \
           bc bison flex libssl-dev \
-          make gcc git curl zip \
-          libelf-dev python3
-
-    - name: Download Toolchain
-      run: |
-        git clone --depth=1 \
-          https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 \
-          toolchain
+          make git curl zip \
+          libelf-dev python3 \
+          clang lld llvm
 
     - name: Download Kernel Source
       run: |
@@ -37,13 +32,23 @@ jobs:
     - name: Build Kernel
       run: |
         export ARCH=arm64
-        export CROSS_COMPILE=$(pwd)/toolchain/bin/aarch64-linux-android-
+        export CLANG_TRIPLE=aarch64-linux-gnu-
+        export CROSS_COMPILE=aarch64-linux-gnu-
         cd kernel-source
-        make ARCH=arm64 exynos1330-a14xmxx_defconfig
-        make ARCH=arm64 -j$(nproc)
+        make ARCH=arm64 \
+          CC=clang \
+          CLANG_TRIPLE=aarch64-linux-gnu- \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          exynos1330-a14xmxx_defconfig
+        make ARCH=arm64 \
+          CC=clang \
+          CLANG_TRIPLE=aarch64-linux-gnu- \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          -j$(nproc)
 
     - name: Upload Result
       uses: actions/upload-artifact@v4
       with:
         name: kernel
         path: kernel-source/arch/arm64/boot/Image
+        
