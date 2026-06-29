@@ -34,23 +34,24 @@ jobs:
     - name: Build Kernel
       run: |
         export ARCH=arm64
-        export CROSS_COMPILE=aarch64-linux-gnu-
         cd kernel-source
         make ARCH=arm64 \
           CC=clang \
+          CLANG_TRIPLE=aarch64-linux-gnu- \
+          CROSS_COMPILE=aarch64-linux-gnu- \
           LD=ld.lld \
           AR=llvm-ar \
           NM=llvm-nm \
           OBJCOPY=llvm-objcopy \
-          CROSS_COMPILE=aarch64-linux-gnu- \
           s5e8535-a14xxx_defconfig
         make ARCH=arm64 \
           CC=clang \
+          CLANG_TRIPLE=aarch64-linux-gnu- \
+          CROSS_COMPILE=aarch64-linux-gnu- \
           LD=ld.lld \
           AR=llvm-ar \
           NM=llvm-nm \
           OBJCOPY=llvm-objcopy \
-          CROSS_COMPILE=aarch64-linux-gnu- \
           -j$(nproc)
 
     - name: Upload Result
